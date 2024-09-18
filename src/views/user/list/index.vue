@@ -90,10 +90,11 @@
         :label-width="100"
         :model="modalForm"
       >
-        <!-- <n-form-item v-if="['add', 'edit'].includes(modalAction)" label="头像" path="avatar">
+        <n-form-item v-if="['edit'].includes(modalAction)" label="头像" path="avatar">
           <CustomUpload v-model:value="modalForm.avatar"></CustomUpload>
-        </n-form-item> -->
-        <!-- <n-form-item
+        </n-form-item>
+        <n-form-item
+          v-if="['edit'].includes(modalAction)"
           label="用户名"
           path="name"
           :rule="{
@@ -106,7 +107,7 @@
             v-model:value="modalForm.name"
             :disabled="!['edit', 'add'].includes(modalAction)"
           />
-        </n-form-item> -->
+        </n-form-item>
         <n-form-item
           v-if="['add', 'edit'].includes(modalAction)"
           label="手机号"
@@ -242,7 +243,6 @@ const {
 watch(copied, (val) => {
   val && $message.success('已复制到剪切板')
 })
-// 修改龙蛋数量 end
 onMounted(() => {
   $table.value?.handleSearch()
 })

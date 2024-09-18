@@ -112,17 +112,39 @@
             @search="userHandleSearch"
           />
         </n-form-item>
+        <n-form-item v-if="['edit'].includes(modalAction)" label="头像" path="avatar">
+          <CustomUpload v-model:value="modalForm.avatar"></CustomUpload>
+        </n-form-item>
         <n-form-item
           v-if="['edit'].includes(modalAction)"
-          label="头像"
-          path="avatar"
+          label="用户名"
+          path="originNick"
           :rule="{
             required: true,
-            message: '请上传头像',
+            message: '请输入用户名',
             trigger: ['input', 'blur'],
           }"
         >
-          <CustomUpload v-model:value="modalForm.avatar"></CustomUpload>
+          <n-input
+            v-model:value="modalForm.originNick"
+            :disabled="!['edit', 'add'].includes(modalAction)"
+          />
+        </n-form-item>
+        <n-form-item
+          v-if="['add', 'edit'].includes(modalAction)"
+          label="手机号"
+          path="phone"
+          :rule="{
+            required: true,
+            message: '请输入手机号',
+            trigger: ['input', 'blur'],
+          }"
+        >
+          <n-input v-model:value="modalForm.phone" :disabled="modalAction !== 'add'">
+            <template #suffix>
+              <i class="i-fe:refresh-ccw cursor-pointer" @click="handleGetPhone()" />
+            </template>
+          </n-input>
         </n-form-item>
         <n-form-item v-if="['resetPwd'].includes(modalAction)" label="类型">
           <n-radio-group v-model:value="modalForm.type" name="changePwdType">

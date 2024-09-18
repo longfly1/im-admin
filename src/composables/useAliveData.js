@@ -1,8 +1,3 @@
-/********************************** *
- * @LastEditTime: 2023/12/05 21:22:28
-
- **********************************/
-
 const lastDataMap = new Map()
 export const useAliveData = (initData = {}, key) => {
   key = key ?? useRoute().name

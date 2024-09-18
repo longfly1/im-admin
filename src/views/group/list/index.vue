@@ -105,6 +105,7 @@
             :options="userOptions"
             :loading="userLoading"
             :render-label="renderUserLabel"
+            :render-tag="renderUserSelectTag"
             value-field="id"
             clearable
             remote
@@ -344,13 +345,11 @@
 </template>
 
 <script setup>
-import { NAvatar, NButton, NSwitch, NTag, NSpace, NFlex, NText } from 'naive-ui'
+import { NAvatar, NButton, NSwitch, NTag, NSpace, NText } from 'naive-ui'
 import { formatDateTime } from '@/utils'
 import { MeCrud, MeQueryItem, MeModal, CustomUpload } from '@/components'
-import { useCrud } from '@/composables'
+import { useCrud, useUserSelect } from '@/composables'
 import api from './api'
-import apiGroupUser from '../user/api'
-import apiUser from '../../user/list/api'
 import { useClipboard } from '@vueuse/core'
 
 defineOptions({ name: 'GroupList' })
@@ -361,7 +360,7 @@ const { copy, copied } = useClipboard()
 const $table = ref(null)
 
 /** QueryBar筛选参数（可选） */
-const queryItems = ref({ sortField: 'createTime', sortType: 'desc', op: { type: 'eq' } })
+const queryItems = ref({ type: 2, sortField: 'createTime', sortType: 'desc', op: { type: 'eq' } })
 
 const clickKillArr = ref([])
 const {
@@ -382,6 +381,9 @@ const {
   doUpdate: api.update,
   refresh: (data = false) => $table.value?.handleSearch(data),
 })
+
+const { userOptions, userLoading, userHandleSearch, renderUserSelectTag, renderUserLabel } =
+  useUserSelect({ modalForm, modalAction })
 
 watch(copied, (val) => {
   val && $message.success('已复制到剪切板')
@@ -754,119 +756,6 @@ const columns = [
   },
 ]
 
-// 用户查找
-const userOptions = ref()
-const userLoading = ref(false)
-function userHandleSearch(query = '') {
-  userLoading.value = true
-  let params = {}
-  if (modalAction.value == 'groupConfig') {
-    params = {
-      pageNum: 1,
-      pageSize: 30,
-      groupId: modalForm.value.groupId,
-      originNick: query,
-      type: modalForm.value.type,
-      sortField: 'createTime',
-      sortType: 'desc',
-      ignore: ['type'],
-      op: { groupId: 'eq' },
-    }
-  } else {
-    params = {
-      pageNum: 1,
-      pageSize: 30,
-      id: query,
-      userRole: 2,
-      sortField: 'createTime',
-      sortType: 'desc',
-      op: { userRole: 'eq' },
-    }
-  }
-  const apiCall = modalAction.value === 'groupConfig' ? apiGroupUser : apiUser
-  apiCall.fetchData(params).then((res) => {
-    userOptions.value = res.data.list
-    userLoading.value = false
-  })
-}
-
-function renderUserSelectTag({ option, handleClose }) {
-  return h(
-    NTag,
-    {
-      style: {
-        padding: '0 6px 0 4px',
-      },
-      round: true,
-      closable: true,
-      onClose: (e) => {
-        e.stopPropagation()
-        handleClose()
-      },
-    },
-    {
-      default: () =>
-        h(
-          'div',
-          {
-            style: {
-              display: 'flex',
-              alignItems: 'center',
-            },
-          },
-          [
-            h(NAvatar, {
-              src: option.avatar,
-              round: true,
-              size: 22,
-              style: {
-                marginRight: '4px',
-              },
-            }),
-            modalAction.value === 'groupConfig' ? option.originNick || option.name : option.name,
-          ]
-        ),
-    }
-  )
-}
-function renderUserLabel(option) {
-  return h(
-    NFlex,
-    {
-      align: 'center',
-    },
-    [
-      h(NAvatar, {
-        src: option.avatar,
-        round: true,
-        size: 'small',
-      }),
-      h(
-        'div',
-        {
-          style: {
-            marginLeft: '10px',
-            padding: '4px 0',
-          },
-        },
-        [
-          h('div', null, [
-            modalAction.value === 'groupConfig' ? option.originNick || option.name : option.name,
-            ' _ ',
-            option.phone,
-          ]),
-          h(
-            NText,
-            { depth: 3, tag: 'div' },
-            {
-              default: () => option.id,
-            }
-          ),
-        ]
-      ),
-    ]
-  )
-}
 function onSave() {
   if (modalAction.value === 'groupConfig') {
     return handleSave({
