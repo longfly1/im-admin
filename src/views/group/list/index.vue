@@ -29,7 +29,7 @@
       ref="$table"
       v-model:query-items="queryItems"
       :columns="columns"
-      :scroll-x="2000"
+      :scroll-x="2600"
       :get-data="api.fetchData"
       @on-delete="handleDelete"
     >
@@ -222,7 +222,7 @@
                 :loading="userLoading"
                 :render-label="renderUserLabel"
                 :render-tag="renderUserSelectTag"
-                value-field="id"
+                value-field="uid"
                 clearable
                 remote
                 multiple
@@ -481,6 +481,22 @@ const columns = [
     },
   },
   {
+    title: '总上分',
+    key: 'rechargeAll',
+    sortOrder: 'rechargeAll',
+    sorter(sorters) {
+      tableSorterSearch(sorters)
+    },
+  },
+  {
+    title: '总下分',
+    key: 'withholdAll',
+    sortOrder: 'withholdAll',
+    sorter(sorters) {
+      tableSorterSearch(sorters)
+    },
+  },
+  {
     title: '玩家总余额',
     key: 'groupNumberIntegral',
     sortOrder: 'groupNumberIntegral',
@@ -651,6 +667,9 @@ const columns = [
                   })
                   if (res.data.groupUsers) {
                     let userIds = Object.keys(res.data.groupUsers)
+                    userIds.map((item) => {
+                      res.data.groupUsers[item]['uid'] = item
+                    })
                     userOptions.value = Object.values(res.data.groupUsers)
                     clickKillArr.value = userIds
                   }

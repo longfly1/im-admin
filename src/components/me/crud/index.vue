@@ -43,6 +43,7 @@
 import { NDataTable } from 'naive-ui'
 import { ref } from 'vue'
 import { utils, writeFile } from 'xlsx'
+import jsonBig from 'json-bigint'
 
 const props = defineProps({
   /**
@@ -120,7 +121,14 @@ async function handleQuery() {
       ...props.queryItems,
       ...paginationParams,
     })
-    tableData.value = data?.list || data
+    const json = jsonBig({
+      storeAsString: true,
+    })
+    try {
+      tableData.value = json.parse(data?.list || data)
+    } catch (error) {
+      tableData.value = data?.list || data
+    }
     pagination.itemCount = data.total
   } catch (error) {
     tableData.value = []

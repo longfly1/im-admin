@@ -253,15 +253,15 @@ const columns = [
     ellipsis: {
       tooltip: true,
     },
-    render: ({ id }) =>
+    render: ({ uid }) =>
       h(
         NText,
         {
           class: 'cursor-pointer',
           type: 'info',
-          onClick: () => copy(id),
+          onClick: () => copy(uid),
         },
-        id
+        uid
       ),
   },
   {

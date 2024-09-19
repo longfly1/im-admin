@@ -1,13 +1,13 @@
 import { NAvatar, NTag, NFlex, NText } from 'naive-ui'
 import apiGroupUser from '@/views/group/user/api'
 import apiUser from '@/views/user/list/api'
+import { throttle } from '@/utils'
 
 export const useUserSelect = ({ modalForm, modalAction }) => {
   const userOptions = ref()
   const userLoading = ref(false)
 
-  /** 查找用户 */
-  function userHandleSearch(query = '') {
+  function search(query) {
     userLoading.value = true
     let params = {}
     if (modalAction && modalAction.value == 'groupConfig') {
@@ -42,8 +42,14 @@ export const useUserSelect = ({ modalForm, modalAction }) => {
         userLoading.value = false
       })
   }
+  /** 查找用户 */
+  function userHandleSearch(query = '') {
+    throttle(search(query), 1000)
+  }
 
   function renderUserSelectTag({ option, handleClose }) {
+    console.log(option)
+
     return h(
       NTag,
       {
@@ -114,7 +120,7 @@ export const useUserSelect = ({ modalForm, modalAction }) => {
               NText,
               { depth: 3, tag: 'div' },
               {
-                default: () => option.id,
+                default: () => (modalAction.value === 'groupConfig' ? option.uid : option.id),
               }
             ),
           ]
